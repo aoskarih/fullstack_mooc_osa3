@@ -73,20 +73,6 @@ app.post('/api/persons', (request, response, next) => {
     })
   }
 
-  
-  if (Person.find({ name:body.name })
-    .then(result => {
-      if (result.length !== 0) {
-        return true
-      }
-      return false
-    })
-  ) {
-    return response.status(400).json({ 
-      error: 'name must be unique' 
-    })
-  }
-
   const person = new Person({
     name: body.name,
     number: body.number,
@@ -95,6 +81,7 @@ app.post('/api/persons', (request, response, next) => {
   return person.save()
     .then(result => response.json(result))
     .catch(error => next(error))
+
 })
 
 app.get('/info', (request, response) => {
@@ -114,9 +101,13 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
-  } else if (error.name === 'ValidationError') {
+  } 
+  else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })  
+  } else if (error.name === 'MongoServerError') {
     return response.status(400).json({ error: error.message })  
   }
+  
 
   next(error)
 }
