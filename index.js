@@ -10,7 +10,7 @@ app.use(express.json())
  
 
 // lol -> https://github.com/expressjs/morgan/issues/16
-morgan.token('req-body', function(req,res){
+morgan.token('req-body', function(req){
   return JSON.stringify(req.body)
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :req-body'))
@@ -40,7 +40,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
@@ -84,7 +84,7 @@ app.post('/api/persons', (request, response, next) => {
 
 })
 
-app.get('/info', (request, response) => {
+app.get('/info', (request, response, next) => {
   Person.find({})
     .then(result => {
       response.send(`
